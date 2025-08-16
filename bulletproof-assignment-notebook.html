@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>My Assignment Notebook</title>
+    <meta name="description" content="Digital assignment notebook for students with ADD/ADHD and autism spectrum needs">
+    <meta name="theme-color" content="#667eea">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #4caf50;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+            --light-color: #f8f9fa;
+            --dark-color: #333;
+            
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+            --font-size-base: 16px;
+            --font-size-large: 1.25rem;
+            --font-size-small: 0.875rem;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            --border-radius: 8px;
+            --border-radius-lg: 16px;
+            --border-width: 1px;
+            --max-width: 1000px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            font-weight: normal;
+            font-variant-emoji: emoji;
+        }
+        
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-lg) var(--spacing-md);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0 0 var(--spacing-sm) 0;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-nav {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xl);
+            background: white;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: var(--spacing-md);
+            border: none;
+            background: transparent;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            color: var(--dark-color);
+        }
+        
+        .nav-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-btn:hover:not(.active) {
+            background: var(--light-color);
+        }
+        
+        .view-section {
+            display: none;
+        }
+        
+        .view-section.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .date-selector {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .date-nav button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .date-nav button:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+        
+        .current-date {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--dark-color);
+            min-width: 250px;
+            text-align: center;
+        }
+        
+        .quick-today {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-today:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+        
+        .classes-container {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+        
+        .class-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.2s ease;
+        }
+        
+        .class-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+        
+        .class-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--dark-color);
+            flex: 1;
+        }
+        
+        .class-period {
+            background: var(--light-color);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: 20px;
+            font-size: var(--font-size-small);
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .class-content {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+        
+        .section {
+            background: var(--light-color);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .section h4 {
+            margin: 0 0 var(--spacing-sm) 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.1em;
+        }
+        
+        .completed-work {
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .new-assignments {
+            border-left: 3px solid var(--warning-color);
+        }
+        
+        .notes-section {
+            border-left: 3px solid var(--info-color);
+        }
+        
+        .work-item, .assignment-item {
+            background: white;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-sm);
+            border: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+        
+        .assignment-info {
+            flex: 1;
+        }
+        
+        .assignment-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 2px;
+        }
+        
+        .due-date {
+            font-size: var(--font-size-small);
+            color: #666;
+        }
+        
+        .due-date.overdue {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        
+        .due-date.today {
+            color: var(--warning-color);
+            font-weight: bold;
+        }
+        
+        .due-date.tomorrow {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 4px 8px;
+            font-size: var(--font-size-small);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-base);
+            font-family: var(--font-family);
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: #555;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .assignment-form {
+            display: none;
+            background: #e3f2fd;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-top: var(--spacing-sm);
+            border: 1px solid #bbdefb;
+        }
+        
+        .assignment-form.active {
+            display: block;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+        
+        .assignments-filters {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-small);
+            font-weight: 600;
+        }
+        
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .filter-tab:hover:not(.active) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .assignments-list {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+        
+        .assignment-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .assignment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .assignment-card.overdue {
+            border-left-color: var(--danger-color);
+            background: #ffebee;
+        }
+        
+        .assignment-card.due-soon {
+            border-left-color: var(--warning-color);
+            background: #fff3e0;
+        }
+        
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-sm);
+            gap: var(--spacing-md);
+        }
+        
+        .assignment-details h3 {
+            margin: 0 0 var(--spacing-xs) 0;
+            color: var(--dark-color);
+            font-size: 1.2em;
+        }
+        
+        .assignment-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-size-small);
+            color: #666;
+            margin-bottom: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+        
+        .meta-tag {
+            background: var(--light-color);
+            padding: 2px var(--spacing-sm);
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+        
+        .stats-summary {
+            background: white;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+            color: #666;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .setup-container {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .setup-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .setup-header h2 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.8em;
+        }
+        
+        .setup-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+        
+        .class-input-group {
+            background: var(--light-color);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            border: 2px solid #e0e0e0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .class-input-group:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .class-input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: #555;
+            font-size: 1.1em;
+        }
+        
+        .setup-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: var(--spacing-xl) 0;
+        }
+        
+        .backup-section {
+            background: linear-gradient(135deg, #e8f4f8, var(--light-color));
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            margin-top: var(--spacing-xl);
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .backup-section h3 {
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.4em;
+        }
+        
+        .backup-section p {
+            color: #666;
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.6;
+        }
+        
+        .backup-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .backup-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            transition: all 0.3s ease;
+        }
+        
+        .backup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .backup-info {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .backup-info h4 {
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .backup-info ul {
+            margin: 0;
+            padding-left: var(--spacing-lg);
+        }
+        
+        .backup-info li {
+            color: #666;
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.5;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl) var(--spacing-lg);
+            color: #666;
+        }
+        
+        .empty-state .icon {
+            font-size: 4em;
+            margin-bottom: var(--spacing-lg);
+            font-weight: normal;
+        }
+        
+        .import-status {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-top: var(--spacing-md);
+            display: none;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-sm);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-nav {
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+            
+            .date-nav {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .assignment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm);
+            }
+            
+            .filter-tabs {
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+            
+            .classes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .setup-buttons {
+                flex-direction: column;
+            }
+            
+            .backup-buttons {
+                flex-direction: column;
+            }
+            
+            .backup-btn {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 My Assignment Notebook</h1>
+            <p>Digital planner for organized students</p>
+        </div>
+        
+        <div class="main-nav">
+            <button class="nav-btn active" id="journalTab" onclick="switchView('journal')">
+                📝 Daily Journal
+            </button>
+            <button class="nav-btn" id="assignmentsTab" onclick="switchView('assignments')">
+                📋 Assignment List
+            </button>
+            <button class="nav-btn" id="classNotesTab" onclick="switchView('classNotes')">
+                📚 Class Notes
+            </button>
+            <button class="nav-btn" id="setupTab" onclick="switchView('setup')">
+                ⚙️ Setup & Backup
+            </button>
+        </div>
+        
+        <!-- Daily Journal View -->
+        <div class="view-section active" id="journalView">
+            <div class="date-selector">
+                <div class="date-nav">
+                    <button onclick="changeDate(-1)" title="Previous Day">&larr;</button>
+                    <div class="current-date" id="currentDate">Today, August 16, 2025</div>
+                    <button onclick="changeDate(1)" title="Next Day">&rarr;</button>
+                </div>
+                <button class="quick-today" onclick="goToToday()">📅 Today</button>
+            </div>
+            
+            <div class="classes-container" id="classesContainer">
+                <!-- Classes will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Assignment List View -->
+        <div class="view-section" id="assignmentsView">
+            <div class="assignments-filters">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filterAssignments('all', this)">All</button>
+                    <button class="filter-tab" onclick="filterAssignments('due-today', this)">Due Today</button>
+                    <button class="filter-tab" onclick="filterAssignments('due-tomorrow', this)">Due Tomorrow</button>
+                    <button class="filter-tab" onclick="filterAssignments('due-this-week', this)">This Week</button>
+                    <button class="filter-tab" onclick="filterAssignments('overdue', this)">Overdue</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: var(--spacing-md);">
+                    <button class="btn btn-primary" onclick="exportData()">
+                        💾 Quick Backup Download
+                    </button>
+                </div>
+            </div>
+            
+            <div class="stats-summary" id="assignmentStats">
+                <!-- Assignment statistics will be shown here -->
+            </div>
+            
+            <div class="assignments-list" id="assignmentsList">
+                <!-- Assignments will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Class Notes View -->
+        <div class="view-section" id="classNotesView">
+            <div class="card">
+                <div class="empty-state">
+                    <div class="icon">📝</div>
+                    <h3>Class Notes Feature</h3>
+                    <p>Coming soon! This will show your notes organized by class and date.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Setup View -->
+        <div class="view-section" id="setupView">
+            <div class="setup-container">
+                <div class="setup-header">
+                    <h2>⚙️ Setup Your Classes</h2>
+                    <p>Enter your class schedule to get started with your digital assignment notebook.</p>
+                </div>
+                
+                <div class="classes-grid" id="classSetupGrid">
+                    <!-- Class setup inputs will be here -->
+                </div>
+                
+                <div class="setup-buttons">
+                    <button class="btn btn-secondary" onclick="addClassSlot()">➕ Add Another Class</button>
+                    <button class="btn btn-primary" onclick="saveClassSetup()">💾 Save Classes</button>
+                </div>
+                
+                <!-- Backup Section -->
+                <div class="backup-section">
+                    <h3>💾 Backup & Restore Your Data</h3>
+                    <p>Download a backup file that you can email to yourself, save to your phone, or store anywhere safe!</p>
+                    
+                    <div class="backup-buttons">
+                        <button class="backup-btn btn-primary" onclick="exportData()">
+                            📄 Download Backup File
+                        </button>
+                        <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
+                        <button class="backup-btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                            📤 Restore from Backup
+                        </button>
+                    </div>
+                    
+                    <div class="import-status" id="importStatus">
+                        <!-- Import status messages will appear here -->
+                    </div>
+                    
+                    <div class="backup-info">
+                        <h4>💡 Backup Tips:</h4>
+                        <ul>
+                            <li>Email the backup file to yourself for safekeeping</li>
+                            <li>Download a new backup weekly to stay current</li>
+                            <li>Share backup files with family members who help with homework</li>
+                            <li>Keep backups when switching devices or browsers</li>
+                            <li>Backup files are small (usually under 100KB) and easy to share</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(window, document) {
+            'use strict';
+            
+            // ===== PRODUCTION-READY STORAGE MANAGEMENT =====
+            
+            function isStorageSupported(storageType) {
+                if (typeof window === 'undefined' || !window[storageType]) return false;
+                
+                var storage;
+                try {
+                    storage = window[storageType];
+                    if (!storage) return false;
+                    
+                    var testKey = '__storage_test__';
+                    storage.setItem(testKey, testKey);
+                    storage.removeItem(testKey);
+                    return true;
+                } catch (err) {
+                    return (
+                        err instanceof DOMException &&
+                        (err.code === 22 || err.code === 1014 ||
+                         err.name === 'QuotaExceededError' ||
+                         err.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                        storage && storage.length > 0
+                    );
+                }
+            }
+            
+            function isQuotaExceededError(err) {
+                return (
+                    err instanceof DOMException &&
+                    (err.code === 22 || err.code === 1014 ||
+                     err.name === 'QuotaExceededError' ||
+                     err.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+                );
+            }
+            
+            function safeSetItem(key, value, maxRetries) {
+                if (maxRetries === undefined) maxRetries = 3;
+                
+                if (typeof window === 'undefined' || !window.localStorage) {
+                    return { success: false, error: 'ENVIRONMENT_UNAVAILABLE' };
+                }
+                
+                try {
+                    localStorage.setItem(key, value);
+                    return { success: true };
+                } catch (error) {
+                    if (isQuotaExceededError(error)) {
+                        if (maxRetries > 0) {
+                            clearOldestItems(1);
+                            return safeSetItem(key, value, maxRetries - 1);
+                        }
+                        return { 
+                            success: false, 
+                            error: 'QUOTA_EXCEEDED',
+                            message: 'Storage quota exceeded, unable to save data'
+                        };
+                    }
+                    
+                    return { 
+                        success: false, 
+                        error: 'STORAGE_UNAVAILABLE',
+                        message: 'Local storage is not available'
+                    };
+                }
+            }
+            
+            function clearOldestItems(count) {
+                if (typeof window === 'undefined' || !window.localStorage) return;
+                
+                try {
+                    var keys = [];
+                    for (var i = 0; i < localStorage.length; i++) {
+                        var key = localStorage.key(i);
+                        if (key && key.indexOf('assignmentNotebook_') === 0) {
+                            keys.push(key);
+                        }
+                    }
+                    
+                    if (keys.length > count) {
+                        for (var j = 0; j < count; j++) {
+                            localStorage.removeItem(keys[j]);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error clearing storage:', e);
+                }
+            }
+            
+            // Production Storage Class
+            function ProductionStorage(namespace) {
+                this.namespace = namespace || 'assignmentNotebook_';
+                this.memoryFallback = {};
+                this.isAvailable = this.initializeStorage();
+            }
+            
+            ProductionStorage.prototype.initializeStorage = function() {
+                if (typeof window === 'undefined') return false;
+                return isStorageSupported('localStorage');
+            };
+            
+            ProductionStorage.prototype.set = function(key, value) {
+                if (!this.isAvailable) {
+                    this.memoryFallback[key] = JSON.stringify(value);
+                    return false;
+                }
+                
+                try {
+                    var dataToStore = {
+                        value: value,
+                        timestamp: Date.now(),
+                        version: 1
+                    };
+                    
+                    var result = safeSetItem(
+                        this.namespace + key, 
+                        JSON.stringify(dataToStore)
+                    );
+                    
+                    if (!result.success) {
+                        this.memoryFallback[key] = JSON.stringify(dataToStore);
+                    }
+                    
+                    return result.success;
+                } catch (e) {
+                    this.memoryFallback[key] = JSON.stringify({ value: value, timestamp: Date.now() });
+                    return false;
+                }
+            };
+            
+            ProductionStorage.prototype.get = function(key, defaultValue) {
+                if (defaultValue === undefined) defaultValue = null;
+                
+                if (!this.isAvailable) {
+                    var stored = this.memoryFallback[key];
+                    return stored ? JSON.parse(stored).value : defaultValue;
+                }
+                
+                try {
+                    var stored = localStorage.getItem(this.namespace + key);
+                    if (!stored && this.memoryFallback[key]) {
+                        var fallback = JSON.parse(this.memoryFallback[key]);
+                        return fallback.value;
+                    }
+                    return stored ? JSON.parse(stored).value : defaultValue;
+                } catch (e) {
+                    var fallback = this.memoryFallback[key];
+                    return fallback ? JSON.parse(fallback).value : defaultValue;
+                }
+            };
+            
+            // ===== APPLICATION STATE =====
+            
+            var storage = new ProductionStorage('assignmentNotebook_');
+            var currentView = 'journal';
+            var currentDate = new Date();
+            var currentFilter = 'all';
+            var classes = [];
+            var journalEntries = {};
+            var assignments = [];
+            
+            // Sample data for demonstration
+            var sampleClasses = [
+                { id: 1, name: "AP Biology", period: "1st Period", teacher: "Mrs. Johnson", room: "B201" },
+                { id: 2, name: "Algebra 2", period: "2nd Period", teacher: "Mr. Smith", room: "M105" },
+                { id: 3, name: "AP World History", period: "3rd Period", teacher: "Ms. Davis", room: "H302" },
+                { id: 4, name: "English 10", period: "4th Period", teacher: "Mr. Wilson", room: "E201" }
+            ];
+            
+            // ===== UTILITY FUNCTIONS =====
+            
+            function formatDate(date) {
+                var options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                return date.toLocaleDateString('en-US', options);
+            }
+            
+            function getDateKey(date) {
+                return date.toISOString().split('T')[0];
+            }
+            
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            }
+            
+            function showNotification(message, type) {
+                var notification = document.createElement('div');
+                notification.style.cssText = 
+                    'position: fixed; top: 20px; right: 20px; z-index: 10000; ' +
+                    'padding: 15px 20px; border-radius: 8px; font-weight: 600; ' +
+                    'box-shadow: 0 4px 12px rgba(0,0,0,0.2); max-width: 300px;';
+                
+                if (type === 'error') {
+                    notification.style.background = '#f44336';
+                    notification.style.color = 'white';
+                } else {
+                    notification.style.background = '#4caf50';
+                    notification.style.color = 'white';
+                }
+                
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(function() {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 3000);
+            }
+            
+            // ===== DATA MANAGEMENT =====
+            
+            function loadData() {
+                try {
+                    var savedClasses = storage.get('classes');
+                    var savedEntries = storage.get('entries');
+                    var savedAssignments = storage.get('assignments');
+                    
+                    if (savedClasses && savedClasses.length > 0) {
+                        classes = savedClasses;
+                    } else {
+                        classes = sampleClasses.slice();
+                    }
+                    
+                    if (savedEntries) {
+                        journalEntries = savedEntries;
+                    }
+                    
+                    if (savedAssignments) {
+                        assignments = savedAssignments;
+                    }
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    classes = sampleClasses.slice();
+                    journalEntries = {};
+                    assignments = [];
+                }
+            }
+            
+            function saveData() {
+                try {
+                    storage.set('classes', classes);
+                    storage.set('entries', journalEntries);
+                    storage.set('assignments', assignments);
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    showNotification('Unable to save data. Storage might be full.', 'error');
+                }
+            }
+            
+            // ===== NAVIGATION =====
+            
+            function switchView(view) {
+                currentView = view;
+                
+                var navBtns = document.querySelectorAll('.nav-btn');
+                for (var i = 0; i < navBtns.length; i++) {
+                    navBtns[i].classList.remove('active');
+                }
+                document.getElementById(view + 'Tab').classList.add('active');
+                
+                var viewSections = document.querySelectorAll('.view-section');
+                for (var i = 0; i < viewSections.length; i++) {
+                    viewSections[i].classList.remove('active');
+                }
+                document.getElementById(view + 'View').classList.add('active');
+                
+                if (view === 'journal') {
+                    renderJournalView();
+                } else if (view === 'assignments') {
+                    renderAssignmentsList();
+                } else if (view === 'setup') {
+                    renderSetupView();
+                }
+            }
+            
+            // ===== DAILY JOURNAL FUNCTIONS =====
+            
+            function updateCurrentDateDisplay() {
+                var today = new Date();
+                var isToday = getDateKey(currentDate) === getDateKey(today);
+                var prefix = isToday ? 'Today, ' : '';
+                document.getElementById('currentDate').textContent = prefix + formatDate(currentDate);
+            }
+            
+            function changeDate(days) {
+                currentDate.setDate(currentDate.getDate() + days);
+                updateCurrentDateDisplay();
+                renderJournalView();
+            }
+            
+            function goToToday() {
+                currentDate = new Date();
+                updateCurrentDateDisplay();
+                renderJournalView();
+            }
+            
+            function getDueDateClass(dueDate) {
+                if (!dueDate) return '';
+                var today = new Date();
+                var due = new Date(dueDate);
+                var diffTime = due - today;
+                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0) return 'overdue';
+                if (diffDays === 0) return 'today';
+                if (diffDays === 1) return 'tomorrow';
+                return '';
+            }
+            
+            function formatDueDate(dueDate) {
+                if (!dueDate) return 'No due date';
+                var due = new Date(dueDate);
+                var today = new Date();
+                var diffTime = due - today;
+                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0) return Math.abs(diffDays) + ' days ago';
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return 'Tomorrow';
+                return due.toLocaleDateString();
+            }
+            
+            function renderJournalView() {
+                var container = document.getElementById('classesContainer');
+                var dateKey = getDateKey(currentDate);
+                var dayEntries = journalEntries[dateKey] || {};
+                
+                if (classes.length === 0) {
+                    container.innerHTML = 
+                        '<div class="card">' +
+                            '<div class="empty-state">' +
+                                '<div class="icon">📚</div>' +
+                                '<h3>No classes set up yet!</h3>' +
+                                '<p>Go to Setup & Backup to add your schedule.</p>' +
+                            '</div>' +
+                        '</div>';
+                    return;
+                }
+                
+                var html = '';
+                for (var i = 0; i < classes.length; i++) {
+                    var classItem = classes[i];
+                    var classEntry = dayEntries[classItem.id] || { completed: [], assignments: [], notes: '' };
+                    
+                    html += 
+                        '<div class="class-card">' +
+                            '<div class="class-header">' +
+                                '<div class="class-name">' + escapeHtml(classItem.name) + '</div>' +
+                                '<div class="class-period">' + escapeHtml(classItem.period) + '</div>' +
+                            '</div>' +
+                            '<div class="class-content">' +
+                                '<div class="section completed-work">' +
+                                    '<h4>✅ Work Completed Today</h4>' +
+                                    '<div class="completed-list">';
+                    
+                    for (var j = 0; j < classEntry.completed.length; j++) {
+                        var work = classEntry.completed[j];
+                        html += 
+                            '<div class="work-item">' +
+                                '<span>' + escapeHtml(work) + '</span>' +
+                                '<button class="btn btn-danger btn-small" onclick="removeCompletedWork(' + classItem.id + ', \'' + escapeJs(work) + '\')">✕</button>' +
+                            '</div>';
+                    }
+                    
+                    html += 
+                                    '</div>' +
+                                    '<input type="text" class="form-control" id="newWork-' + classItem.id + '" placeholder="What did you complete today?" onkeypress="handleWorkEnter(event, ' + classItem.id + ')">' +
+                                    '<button class="btn btn-primary" onclick="addCompletedWork(' + classItem.id + ')">Add Work</button>' +
+                                '</div>' +
+                                
+                                '<div class="section new-assignments">' +
+                                    '<h4>📝 New Assignments Given</h4>' +
+                                    '<div class="assignments-list">';
+                    
+                    for (var k = 0; k < classEntry.assignments.length; k++) {
+                        var assignment = classEntry.assignments[k];
+                        html += 
+                            '<div class="assignment-item">' +
+                                '<div class="assignment-info">' +
+                                    '<div class="assignment-title">' + escapeHtml(assignment.title) + '</div>' +
+                                    '<div class="due-date ' + getDueDateClass(assignment.dueDate) + '">Due: ' + formatDueDate(assignment.dueDate) + '</div>' +
+                                '</div>' +
+                                '<button class="btn btn-danger btn-small" onclick="removeAssignment(' + classItem.id + ', \'' + assignment.id + '\')">Remove</button>' +
+                            '</div>';
+                    }
+                    
+                    html += 
+                                    '</div>' +
+                                    '<button class="btn btn-primary" onclick="showAssignmentForm(' + classItem.id + ')">Add Assignment</button>' +
+                                    '<div class="assignment-form" id="assignmentForm-' + classItem.id + '">' +
+                                        '<div class="form-row">' +
+                                            '<div class="form-group">' +
+                                                '<label>Assignment Title</label>' +
+                                                '<input type="text" class="form-control" id="assignmentTitle-' + classItem.id + '" placeholder="e.g., Chapter 8 reading">' +
+                                            '</div>' +
+                                            '<div class="form-group">' +
+                                                '<label>Due Date</label>' +
+                                                '<input type="date" class="form-control" id="assignmentDue-' + classItem.id + '">' +
+                                            '</div>' +
+                                        '</div>' +
+                                        '<div class="form-buttons">' +
+                                            '<button class="btn btn-success" onclick="saveAssignment(' + classItem.id + ')">Save</button>' +
+                                            '<button class="btn btn-secondary" onclick="hideAssignmentForm(' + classItem.id + ')">Cancel</button>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                                
+                                '<div class="section notes-section">' +
+                                    '<h4>📝 Class Notes</h4>' +
+                                    '<textarea class="form-control" id="notes-' + classItem.id + '" placeholder="What did you learn or discuss in class today?" rows="3" onchange="saveNotes(' + classItem.id + ')">' + escapeHtml(classEntry.notes) + '</textarea>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            function addCompletedWork(classId) {
+                var input = document.getElementById('newWork-' + classId);
+                var work = input.value.trim();
+                if (!work) return;
+                
+                var dateKey = getDateKey(currentDate);
+                if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
+                if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], assignments: [], notes: '' };
+                
+                journalEntries[dateKey][classId].completed.push(work);
+                input.value = '';
+                saveData();
+                renderJournalView();
+            }
+            
+            function removeCompletedWork(classId, work) {
+                var dateKey = getDateKey(currentDate);
+                if (journalEntries[dateKey] && journalEntries[dateKey][classId]) {
+                    journalEntries[dateKey][classId].completed = journalEntries[dateKey][classId].completed.filter(function(w) { return w !== work; });
+                    saveData();
+                    renderJournalView();
+                }
+            }
+            
+            function handleWorkEnter(event, classId) {
+                if (event.key === 'Enter') {
+                    addCompletedWork(classId);
+                }
+            }
+            
+            function showAssignmentForm(classId) {
+                document.getElementById('assignmentForm-' + classId).classList.add('active');
+                var today = new Date().toISOString().split('T')[0];
+                document.getElementById('assignmentDue-' + classId).min = today;
+            }
+            
+            function hideAssignmentForm(classId) {
+                document.getElementById('assignmentForm-' + classId).classList.remove('active');
+                document.getElementById('assignmentTitle-' + classId).value = '';
+                document.getElementById('assignmentDue-' + classId).value = '';
+            }
+            
+            function saveAssignment(classId) {
+                var title = document.getElementById('assignmentTitle-' + classId).value.trim();
+                var dueDate = document.getElementById('assignmentDue-' + classId).value;
+                
+                if (!title) {
+                    showNotification('Please enter an assignment title', 'error');
+                    return;
+                }
+                
+                var assignment = {
+                    id: generateId(),
+                    title: title,
+                    dueDate: dueDate,
+                    classId: classId,
+                    completed: false,
+                    createdDate: getDateKey(currentDate)
+                };
+                
+                var dateKey = getDateKey(currentDate);
+                if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
+                if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], assignments: [], notes: '' };
+                
+                journalEntries[dateKey][classId].assignments.push(assignment);
+                assignments.push(assignment);
+                
+                hideAssignmentForm(classId);
+                saveData();
+                renderJournalView();
+                showNotification('Assignment added successfully!', 'success');
+            }
+            
+            function removeAssignment(classId, assignmentId) {
+                var dateKey = getDateKey(currentDate);
+                if (journalEntries[dateKey] && journalEntries[dateKey][classId]) {
+                    journalEntries[dateKey][classId].assignments = journalEntries[dateKey][classId].assignments.filter(function(a) { return a.id !== assignmentId; });
+                    assignments = assignments.filter(function(a) { return a.id !== assignmentId; });
+                    saveData();
+                    renderJournalView();
+                }
+            }
+            
+            function saveNotes(classId) {
+                var notes = document.getElementById('notes-' + classId).value;
+                var dateKey = getDateKey(currentDate);
+                
+                if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
+                if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], assignments: [], notes: '' };
+                
+                journalEntries[dateKey][classId].notes = notes;
+                saveData();
+            }
+            
+            // ===== ASSIGNMENT LIST FUNCTIONS =====
+            
+            function renderAssignmentsList() {
+                var container = document.getElementById('assignmentsList');
+                var statsContainer = document.getElementById('assignmentStats');
+                
+                if (assignments.length === 0) {
+                    container.innerHTML = 
+                        '<div class="card">' +
+                            '<div class="empty-state">' +
+                                '<div class="icon">📋</div>' +
+                                '<h3>No assignments yet!</h3>' +
+                                '<p>Add assignments in your Daily Journal to see them here.</p>' +
+                            '</div>' +
+                        '</div>';
+                    statsContainer.innerHTML = '<p>Start adding assignments to track your progress!</p>';
+                    return;
+                }
+                
+                var filteredAssignments = getFilteredAssignments();
+                updateAssignmentStats(filteredAssignments);
+                
+                if (filteredAssignments.length === 0) {
+                    container.innerHTML = 
+                        '<div class="card">' +
+                            '<div class="empty-state">' +
+                                '<div class="icon">📋</div>' +
+                                '<h3>No assignments match this filter!</h3>' +
+                                '<p>Try selecting a different filter or add more assignments.</p>' +
+                            '</div>' +
+                        '</div>';
+                    return;
+                }
+                
+                var sortedAssignments = filteredAssignments.slice().sort(function(a, b) {
+                    if (!a.dueDate && !b.dueDate) return 0;
+                    if (!a.dueDate) return 1;
+                    if (!b.dueDate) return -1;
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                });
+                
+                var html = '';
+                for (var i = 0; i < sortedAssignments.length; i++) {
+                    var assignment = sortedAssignments[i];
+                    var className = 'Unknown Class';
+                    for (var j = 0; j < classes.length; j++) {
+                        if (classes[j].id === assignment.classId) {
+                            className = classes[j].name;
+                            break;
+                        }
+                    }
+                    
+                    var dueDateClass = getDueDateClass(assignment.dueDate);
+                    var cardClass = '';
+                    if (dueDateClass === 'overdue') cardClass = 'overdue';
+                    else if (dueDateClass === 'today' || dueDateClass === 'tomorrow') cardClass = 'due-soon';
+                    
+                    html += 
+                        '<div class="assignment-card ' + cardClass + '">' +
+                            '<div class="assignment-header">' +
+                                '<div class="assignment-details">' +
+                                    '<h3>' + escapeHtml(assignment.title) + '</h3>' +
+                                    '<div class="assignment-meta">' +
+                                        '<span class="meta-tag">📚 ' + escapeHtml(className) + '</span>' +
+                                        '<span class="meta-tag">📅 Due: ' + formatDueDate(assignment.dueDate) + '</span>' +
+                                        '<span class="meta-tag">📝 Assigned: ' + new Date(assignment.createdDate).toLocaleDateString() + '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<button class="btn btn-success" onclick="completeAssignment(\'' + assignment.id + '\')">' +
+                                    '✅ Mark Complete' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>';
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            function getFilteredAssignments() {
+                var today = new Date();
+                var tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                var weekFromNow = new Date(today);
+                weekFromNow.setDate(weekFromNow.getDate() + 7);
+                
+                return assignments.filter(function(assignment) {
+                    if (assignment.completed) return false;
+                    
+                    if (currentFilter === 'all') return true;
+                    
+                    if (!assignment.dueDate) return currentFilter === 'all';
+                    
+                    var dueDate = new Date(assignment.dueDate);
+                    var todayStr = today.toDateString();
+                    var tomorrowStr = tomorrow.toDateString();
+                    
+                    switch (currentFilter) {
+                        case 'due-today':
+                            return dueDate.toDateString() === todayStr;
+                        case 'due-tomorrow':
+                            return dueDate.toDateString() === tomorrowStr;
+                        case 'due-this-week':
+                            return dueDate >= today && dueDate <= weekFromNow;
+                        case 'overdue':
+                            return dueDate < today;
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            function updateAssignmentStats(filteredAssignments) {
+                var statsContainer = document.getElementById('assignmentStats');
+                var total = assignments.filter(function(a) { return !a.completed; }).length;
+                var completed = assignments.filter(function(a) { return a.completed; }).length;
+                var overdue = assignments.filter(function(a) {
+                    if (a.completed || !a.dueDate) return false;
+                    return new Date(a.dueDate) < new Date();
+                }).length;
+                
+                var showing = filteredAssignments.length;
+                
+                statsContainer.innerHTML = 
+                    '<p>' +
+                        '<strong>Showing ' + showing + ' of ' + total + ' pending assignments</strong>' +
+                        (completed > 0 ? ' • ' + completed + ' completed' : '') +
+                        (overdue > 0 ? ' • ⚠️ ' + overdue + ' overdue' : '') +
+                    '</p>';
+            }
+            
+            function filterAssignments(filter, button) {
+                currentFilter = filter;
+                
+                var filterTabs = document.querySelectorAll('.filter-tab');
+                for (var i = 0; i < filterTabs.length; i++) {
+                    filterTabs[i].classList.remove('active');
+                }
+                button.classList.add('active');
+                
+                renderAssignmentsList();
+            }
+            
+            function completeAssignment(assignmentId) {
+                for (var i = 0; i < assignments.length; i++) {
+                    if (assignments[i].id === assignmentId) {
+                        assignments[i].completed = true;
+                        assignments[i].completedDate = new Date().toISOString();
+                        saveData();
+                        renderAssignmentsList();
+                        
+                        var className = 'Unknown Class';
+                        for (var j = 0; j < classes.length; j++) {
+                            if (classes[j].id === assignments[i].classId) {
+                                className = classes[j].name;
+                                break;
+                            }
+                        }
+                        
+                        showNotification('✅ "' + assignments[i].title + '" completed!', 'success');
+                        break;
+                    }
+                }
+            }
+            
+            // ===== SETUP FUNCTIONS =====
+            
+            function renderSetupView() {
+                var container = document.getElementById('classSetupGrid');
+                var classesToShow = classes.length > 0 ? classes : [{ id: '', name: '', period: '', teacher: '', room: '' }];
+                
+                var html = '';
+                for (var i = 0; i < classesToShow.length; i++) {
+                    var classItem = classesToShow[i];
+                    html += 
+                        '<div class="class-input-group">' +
+                            '<label>Class ' + (i + 1) + '</label>' +
+                            '<input type="text" class="form-control" placeholder="Class Name (e.g., AP Biology)" value="' + escapeHtml(classItem.name || '') + '" data-field="name" data-index="' + i + '">' +
+                            '<input type="text" class="form-control" placeholder="Period (e.g., 1st Period)" value="' + escapeHtml(classItem.period || '') + '" data-field="period" data-index="' + i + '">' +
+                            '<input type="text" class="form-control" placeholder="Teacher (e.g., Mrs. Johnson)" value="' + escapeHtml(classItem.teacher || '') + '" data-field="teacher" data-index="' + i + '">' +
+                            '<input type="text" class="form-control" placeholder="Room (e.g., B201)" value="' + escapeHtml(classItem.room || '') + '" data-field="room" data-index="' + i + '">';
+                            
+                    if (classes.length > 1) {
+                        html += '<button onclick="removeClass(' + i + ')" class="btn btn-danger" style="width: 100%; margin-top: 8px;">Remove Class</button>';
+                    }
+                    
+                    html += '</div>';
+                }
+                
+                container.innerHTML = html;
+            }
+            
+            function addClassSlot() {
+                classes.push({ id: Date.now(), name: '', period: '', teacher: '', room: '' });
+                renderSetupView();
+            }
+            
+            function removeClass(index) {
+                if (classes.length > 1) {
+                    classes.splice(index, 1);
+                    renderSetupView();
+                }
+            }
+            
+            function saveClassSetup() {
+                var inputs = document.querySelectorAll('#classSetupGrid input');
+                var newClasses = [];
+                var classesByIndex = {};
+                
+                for (var i = 0; i < inputs.length; i++) {
+                    var input = inputs[i];
+                    var index = input.dataset.index;
+                    var field = input.dataset.field;
+                    if (!classesByIndex[index]) classesByIndex[index] = {};
+                    classesByIndex[index][field] = input.value.trim();
+                }
+                
+                var indices = Object.keys(classesByIndex);
+                for (var i = 0; i < indices.length; i++) {
+                    var classData = classesByIndex[indices[i]];
+                    var index = parseInt(indices[i]);
+                    if (classData.name) {
+                        newClasses.push({
+                            id: (classes[index] && classes[index].id) || (Date.now() + index),
+                            name: classData.name,
+                            period: classData.period || ('Period ' + (index + 1)),
+                            teacher: classData.teacher || '',
+                            room: classData.room || ''
+                        });
+                    }
+                }
+                
+                if (newClasses.length === 0) {
+                    showNotification('Please enter at least one class name', 'error');
+                    return;
+                }
+                
+                classes = newClasses;
+                saveData();
+                
+                showNotification('✅ Classes saved successfully!', 'success');
+                
+                setTimeout(function() {
+                    switchView('journal');
+                }, 1500);
+            }
+            
+            // ===== BACKUP FUNCTIONS =====
+            
+            function exportData() {
+                try {
+                    var data = {
+                        version: "1.0",
+                        exportDate: new Date().toISOString(),
+                        studentName: "My Assignment Notebook",
+                        classes: classes,
+                        journalEntries: journalEntries,
+                        assignments: assignments
+                    };
+                    
+                    var dataStr = JSON.stringify(data, null, 2);
+                    var blob = new Blob([dataStr], { type: 'application/json' });
+                    var url = URL.createObjectURL(blob);
+                    
+                    var link = document.createElement('a');
+                    link.href = url;
+                    
+                    var today = new Date();
+                    var dateStr = today.toISOString().split('T')[0];
+                    link.download = 'MyAssignments_' + dateStr + '.json';
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    showNotification('📄 Backup file downloaded successfully!', 'success');
+                    
+                } catch (error) {
+                    console.error('Export error:', error);
+                    showNotification('❌ Error creating backup file. Please try again.', 'error');
+                }
+            }
+            
+            function importData(event) {
+                var file = event.target.files[0];
+                if (!file) return;
+                
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        var data = JSON.parse(e.target.result);
+                        
+                        if (!data.classes && !data.journalEntries && !data.assignments) {
+                            throw new Error('Invalid backup file format');
+                        }
+                        
+                        var exportDate = data.exportDate ? new Date(data.exportDate).toLocaleDateString() : 'Unknown date';
+                        var classCount = data.classes ? data.classes.length : 0;
+                        var assignmentCount = data.assignments ? data.assignments.length : 0;
+                        
+                        var confirmMsg = '📤 Restore data from backup?\n\n' +
+                            'Export Date: ' + exportDate + '\n' +
+                            'Classes: ' + classCount + '\n' +
+                            'Assignments: ' + assignmentCount + '\n\n' +
+                            '⚠️ This will replace your current data!';
+                        
+                        if (confirm(confirmMsg)) {
+                            classes = data.classes || [];
+                            journalEntries = data.journalEntries || {};
+                            assignments = data.assignments || [];
+                            
+                            saveData();
+                            
+                            if (currentView === 'journal') {
+                                renderJournalView();
+                            } else if (currentView === 'assignments') {
+                                renderAssignmentsList();
+                            } else if (currentView === 'setup') {
+                                renderSetupView();
+                            }
+                            
+                            showImportStatus('✅ Data restored successfully!', 'success');
+                            
+                            setTimeout(function() {
+                                switchView('journal');
+                            }, 2000);
+                        }
+                        
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        showImportStatus('❌ Error importing backup file. Please make sure you selected a valid backup file.', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+                event.target.value = '';
+            }
+            
+            function showImportStatus(message, type) {
+                var statusDiv = document.getElementById('importStatus');
+                statusDiv.textContent = message;
+                statusDiv.style.display = 'block';
+                
+                if (type === 'error') {
+                    statusDiv.style.background = '#ffebee';
+                    statusDiv.style.color = '#d32f2f';
+                } else {
+                    statusDiv.style.background = '#e8f5e8';
+                    statusDiv.style.color = '#2e7d32';
+                }
+                
+                setTimeout(function() {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+            
+            // ===== UTILITY FUNCTIONS =====
+            
+            function escapeHtml(text) {
+                if (typeof text !== 'string') return text;
+                var map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+            
+            function escapeJs(text) {
+                if (typeof text !== 'string') return text;
+                return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+            }
+            
+            // ===== GLOBAL FUNCTION EXPORTS =====
+            
+            window.switchView = switchView;
+            window.changeDate = changeDate;
+            window.goToToday = goToToday;
+            window.addCompletedWork = addCompletedWork;
+            window.removeCompletedWork = removeCompletedWork;
+            window.handleWorkEnter = handleWorkEnter;
+            window.showAssignmentForm = showAssignmentForm;
+            window.hideAssignmentForm = hideAssignmentForm;
+            window.saveAssignment = saveAssignment;
+            window.removeAssignment = removeAssignment;
+            window.saveNotes = saveNotes;
+            window.filterAssignments = filterAssignments;
+            window.completeAssignment = completeAssignment;
+            window.addClassSlot = addClassSlot;
+            window.removeClass = removeClass;
+            window.saveClassSetup = saveClassSetup;
+            window.exportData = exportData;
+            window.importData = importData;
+            
+            // ===== INITIALIZATION =====
+            
+            function initializeApp() {
+                loadData();
+                updateCurrentDateDisplay();
+                renderJournalView();
+                console.log('Assignment Notebook initialized successfully!');
+                console.log('Storage available:', storage.isAvailable);
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeApp);
+            } else {
+                initializeApp();
+            }
+            
+        })(window, document);
+    </script>
+</body>
+</html>
