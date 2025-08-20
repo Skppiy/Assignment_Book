@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -112,7 +111,9 @@
     .btn-primary { background: #667eea; color: white; }
     .btn-success { background: #4caf50; color: white; }
     .btn-danger { background: #f44336; color: white; }
+    .btn-warning { background: #ff9800; color: white; }
     .btn-small { padding: 5px 10px; font-size: 0.9em; }
+    .btn-edit { background: #17a2b8; color: white; }
     
     .form-control {
         width: 100%;
@@ -154,10 +155,10 @@
     }
     
     .section h4 { margin: 0 0 15px 0; color: #555; font-size: 1.1em; }
-    .completed-section { border-left: 3px solid #4caf50; }
     .notes-section { border-left: 3px solid #2196f3; }
+    .assignments-section { border-left: 3px solid #ff9800; }
     
-    .work-item {
+    .assignment-item {
         background: white;
         padding: 10px;
         border-radius: 8px;
@@ -166,6 +167,24 @@
         justify-content: space-between;
         align-items: center;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .assignment-form {
+        display: none;
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        border: 1px solid #bbdefb;
+    }
+    
+    .assignment-form.active { display: block; }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
     }
     
     .empty-state { text-align: center; padding: 40px; color: #666; }
@@ -204,23 +223,18 @@
         border-radius: 8px;
     }
     
-    .class-edit-form.active {
-        display: block;
-    }
+    .class-edit-form.active { display: block; }
     
-    .btn-edit {
-        background: #17a2b8;
-        color: white;
-        padding: 5px 10px;
-        font-size: 0.9em;
-        margin-right: 5px;
-    }
+    .overdue { color: #f44336; font-weight: bold; }
+    .due-today { color: #ff9800; font-weight: bold; }
+    .due-soon { color: #ffc107; font-weight: bold; }
     
     @media (max-width: 768px) {
         .nav { flex-direction: column; }
         body { padding: 10px; }
         .date-nav { flex-direction: column; gap: 10px; }
         .class-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .form-row { grid-template-columns: 1fr; }
     }
 </style>
 ```
@@ -236,75 +250,44 @@
 ```
     <div class="nav">
         <button class="nav-btn active" data-view="journal">📝 Daily Journal</button>
-        <button class="nav-btn" data-view="assignments">📋 Assignment List</button>
-        <button class="nav-btn" data-view="notes">📚 My Notes</button>
-        <button class="nav-btn" data-view="completed">✅ Completed Work</button>
-        <button class="nav-btn" data-view="setup">⚙️ Setup</button>
+        <button class="nav-btn" data-view="assignments">📋 All Assignments</button>
+        <button class="nav-btn" data-view="notes">📚 All Notes</button>
+        <button class="nav-btn" data-view="setup">⚙️ Setup Classes</button>
     </div>
     
     <!-- Daily Journal View -->
     <div class="view active" id="journalView">
         <div class="card">
             <div class="date-nav">
-                <button id="prevDay" title="Previous Day">&larr;</button>
+                <button id="prevDay">&larr;</button>
                 <div class="current-date" id="currentDate">Today</div>
-                <button id="nextDay" title="Next Day">&rarr;</button>
+                <button id="nextDay">&rarr;</button>
                 <button class="btn btn-success" id="todayBtn">📅 Today</button>
             </div>
         </div>
         <div id="classesContainer"></div>
     </div>
     
-    <!-- Assignment List View -->
+    <!-- All Assignments View -->
     <div class="view" id="assignmentsView">
         <div class="filter-section">
-            <h2>📋 Assignment List</h2>
-            <p>Your pending assignments will appear here.</p>
+            <h2>📋 All Assignments</h2>
+            <p>View and manage all your assignments across all classes.</p>
             <button class="btn btn-primary" id="exportBtn">💾 Download Backup</button>
         </div>
-        <div id="assignmentsList">
-            <div class="empty-state">
-                <div class="icon">📋</div>
-                <h3>No assignments yet!</h3>
-                <p>Add assignments in your Daily Journal to see them here.</p>
-            </div>
-        </div>
+        <div id="assignmentsList"></div>
     </div>
     
-    <!-- Notes View -->
+    <!-- All Notes View -->
     <div class="view" id="notesView">
         <div class="filter-section">
-            <h2>📚 My Notes</h2>
+            <h2>📚 All Notes</h2>
             <label for="notesFilter">Filter by Subject: </label>
             <select id="notesFilter" class="form-control" style="width: auto; display: inline-block;">
                 <option value="all">All Classes</option>
             </select>
         </div>
-        <div id="notesList">
-            <div class="empty-state">
-                <div class="icon">📝</div>
-                <h3>No notes yet!</h3>
-                <p>Start taking notes in your Daily Journal to see them here.</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Completed Work View -->
-    <div class="view" id="completedView">
-        <div class="filter-section">
-            <h2>✅ Completed Work</h2>
-            <label for="completedFilter">Filter by Subject: </label>
-            <select id="completedFilter" class="form-control" style="width: auto; display: inline-block;">
-                <option value="all">All Classes</option>
-            </select>
-        </div>
-        <div id="completedList">
-            <div class="empty-state">
-                <div class="icon">✅</div>
-                <h3>No completed work yet!</h3>
-                <p>Mark work as completed in your Daily Journal to see it here.</p>
-            </div>
-        </div>
+        <div id="notesList"></div>
     </div>
     
     <!-- Setup View -->
@@ -316,9 +299,7 @@
             <!-- Existing Classes -->
             <div style="margin: 20px 0;">
                 <h3>Your Classes</h3>
-                <div id="existingClasses">
-                    <!-- Existing classes will be populated here -->
-                </div>
+                <div id="existingClasses"></div>
             </div>
             
             <!-- Add New Class -->
@@ -342,26 +323,55 @@
 <script>
     // App State
     let currentDate = new Date();
-    let classes = [
-        { id: 1, name: "AP Biology", period: "1st Period" },
-        { id: 2, name: "Algebra 2", period: "2nd Period" },
-        { id: 3, name: "English 10", period: "3rd Period" }
-    ];
+    let classes = [];
     let journalEntries = {};
-    let nextClassId = 4;
+    let assignments = [];
+    let nextClassId = 1;
+    let nextAssignmentId = 1;
     let currentNotesFilter = 'all';
-    let currentCompletedFilter = 'all';
     
     // Utility Functions
     function getDateKey(date) {
         return date.toISOString().split('T')[0];
     }
     
+    function formatDate(date) {
+        return date.toLocaleDateString('en-US', { 
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        });
+    }
+    
+    function formatDueDate(dueDate) {
+        if (!dueDate) return 'No due date';
+        const due = new Date(dueDate);
+        const today = new Date();
+        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) return `${Math.abs(diffDays)} days ago`;
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Tomorrow';
+        return due.toLocaleDateString();
+    }
+    
+    function getDueDateClass(dueDate) {
+        if (!dueDate) return '';
+        const due = new Date(dueDate);
+        const today = new Date();
+        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) return 'overdue';
+        if (diffDays === 0) return 'due-today';
+        if (diffDays === 1) return 'due-soon';
+        return '';
+    }
+    
     function saveData() {
         try {
             localStorage.setItem('assignmentNotebook_classes', JSON.stringify(classes));
             localStorage.setItem('assignmentNotebook_entries', JSON.stringify(journalEntries));
+            localStorage.setItem('assignmentNotebook_assignments', JSON.stringify(assignments));
             localStorage.setItem('assignmentNotebook_nextClassId', nextClassId.toString());
+            localStorage.setItem('assignmentNotebook_nextAssignmentId', nextAssignmentId.toString());
         } catch (e) {
             console.error('Save failed:', e);
         }
@@ -371,11 +381,15 @@
         try {
             const savedClasses = localStorage.getItem('assignmentNotebook_classes');
             const savedEntries = localStorage.getItem('assignmentNotebook_entries');
-            const savedNextId = localStorage.getItem('assignmentNotebook_nextClassId');
+            const savedAssignments = localStorage.getItem('assignmentNotebook_assignments');
+            const savedNextClassId = localStorage.getItem('assignmentNotebook_nextClassId');
+            const savedNextAssignmentId = localStorage.getItem('assignmentNotebook_nextAssignmentId');
             
             if (savedClasses) classes = JSON.parse(savedClasses);
             if (savedEntries) journalEntries = JSON.parse(savedEntries);
-            if (savedNextId) nextClassId = parseInt(savedNextId);
+            if (savedAssignments) assignments = JSON.parse(savedAssignments);
+            if (savedNextClassId) nextClassId = parseInt(savedNextClassId);
+            if (savedNextAssignmentId) nextAssignmentId = parseInt(savedNextAssignmentId);
         } catch (e) {
             console.error('Load failed:', e);
         }
@@ -390,8 +404,8 @@
         document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
         
         if (viewName === 'journal') renderJournal();
-        else if (viewName === 'notes') renderNotes();
-        else if (viewName === 'completed') renderCompleted();
+        else if (viewName === 'assignments') renderAllAssignments();
+        else if (viewName === 'notes') renderAllNotes();
         else if (viewName === 'setup') renderSetup();
     }
     
@@ -400,10 +414,7 @@
         const today = new Date();
         const isToday = currentDate.toDateString() === today.toDateString();
         const prefix = isToday ? 'Today, ' : '';
-        const dateStr = currentDate.toLocaleDateString('en-US', { 
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-        });
-        document.getElementById('currentDate').textContent = prefix + dateStr;
+        document.getElementById('currentDate').textContent = prefix + formatDate(currentDate);
     }
     
     function changeDate(days) {
@@ -421,8 +432,17 @@
     // Journal Functions
     function renderJournal() {
         const container = document.getElementById('classesContainer');
+        
         if (classes.length === 0) {
-            container.innerHTML = '<div class="card"><div class="empty-state"><div class="icon">📚</div><h3>No classes set up yet!</h3><p>Go to Setup to add your classes.</p></div></div>';
+            container.innerHTML = `
+                <div class="card">
+                    <div class="empty-state">
+                        <div class="icon">📚</div>
+                        <h3>No classes set up yet!</h3>
+                        <p>Go to "Setup Classes" to add your schedule first.</p>
+                    </div>
+                </div>
+            `;
             return;
         }
         
@@ -431,7 +451,7 @@
         
         let html = '';
         classes.forEach(classItem => {
-            const entry = dayEntries[classItem.id] || { completed: [], notes: '' };
+            const entry = dayEntries[classItem.id] || { notes: '', assignments: [] };
             
             html += `
                 <div class="class-card">
@@ -440,79 +460,97 @@
                         <div class="class-period">${classItem.period}</div>
                     </div>
                     
-                    <div class="section completed-section">
-                        <h4>✅ Work Completed Today</h4>
-                        <div id="completed-${classItem.id}">
-                            ${entry.completed.map(work => `
-                                <div class="work-item">
-                                    <span>${work}</span>
-                                    <button class="btn btn-danger btn-small" onclick="removeWork(${classItem.id}, '${work.replace(/'/g, "\\'")}')">✕</button>
+                    <div class="section notes-section">
+                        <h4>📝 Class Notes</h4>
+                        <textarea class="form-control notes-textarea" data-class="${classItem.id}" rows="4" placeholder="What did you learn or discuss in class today?">${entry.notes}</textarea>
+                        <small style="color: #666; font-size: 0.85em;">💾 Notes save automatically</small>
+                    </div>
+                    
+                    <div class="section assignments-section">
+                        <h4>📋 Assignments</h4>
+                        <div class="assignments-list">
+                            ${entry.assignments.map(assignment => `
+                                <div class="assignment-item">
+                                    <div>
+                                        <div style="font-weight: 600;">${assignment.title}</div>
+                                        <div style="font-size: 0.9em;" class="${getDueDateClass(assignment.dueDate)}">
+                                            Due: ${formatDueDate(assignment.dueDate)}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-success btn-small complete-assignment-btn" data-id="${assignment.id}">✅ Complete</button>
+                                        <button class="btn btn-danger btn-small remove-assignment-btn" data-class="${classItem.id}" data-id="${assignment.id}">✕</button>
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
-                        <input type="text" class="form-control work-input" data-class="${classItem.id}" placeholder="What did you complete today?">
-                        <button class="btn btn-primary add-work-btn" data-class="${classItem.id}">Add Work</button>
-                    </div>
-                    
-                    <div class="section notes-section">
-                        <h4>📝 Class Notes</h4>
-                        <textarea class="form-control notes-textarea" data-class="${classItem.id}" rows="3" placeholder="What did you learn today?">${entry.notes}</textarea>
-                        <small style="color: #666; font-size: 0.85em;">💾 Notes save automatically</small>
+                        <button class="btn btn-warning add-assignment-btn" data-class="${classItem.id}">+ Add Assignment</button>
+                        <div class="assignment-form" id="assignmentForm-${classItem.id}">
+                            <div class="form-row">
+                                <input type="text" class="form-control" id="assignmentTitle-${classItem.id}" placeholder="Assignment title (e.g., Chapter 8 reading)">
+                                <input type="date" class="form-control" id="assignmentDue-${classItem.id}">
+                            </div>
+                            <button class="btn btn-success save-assignment-btn" data-class="${classItem.id}">💾 Save Assignment</button>
+                            <button class="btn btn-secondary cancel-assignment-btn" data-class="${classItem.id}">❌ Cancel</button>
+                        </div>
                     </div>
                 </div>
             `;
         });
         
         container.innerHTML = html;
-        
-        // Add event listeners
-        document.querySelectorAll('.add-work-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const classId = parseInt(this.dataset.class);
-                addWork(classId);
-            });
-        });
-        
-        document.querySelectorAll('.work-input').forEach(input => {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const classId = parseInt(this.dataset.class);
-                    addWork(classId);
-                }
-            });
-        });
-        
+        attachJournalEventListeners();
+    }
+    
+    function attachJournalEventListeners() {
+        // Notes auto-save
         document.querySelectorAll('.notes-textarea').forEach(textarea => {
             textarea.addEventListener('blur', function() {
                 const classId = parseInt(this.dataset.class);
                 saveNotes(classId);
             });
         });
-    }
-    
-    function addWork(classId) {
-        const input = document.querySelector(`.work-input[data-class="${classId}"]`);
-        const work = input.value.trim();
-        if (!work) return;
         
-        const dateKey = getDateKey(currentDate);
-        if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
-        if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], notes: '' };
+        // Add assignment buttons
+        document.querySelectorAll('.add-assignment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.class);
+                showAssignmentForm(classId);
+            });
+        });
         
-        journalEntries[dateKey][classId].completed.push(work);
-        input.value = '';
-        saveData();
-        renderJournal();
-    }
-    
-    function removeWork(classId, work) {
-        const dateKey = getDateKey(currentDate);
-        if (journalEntries[dateKey] && journalEntries[dateKey][classId]) {
-            journalEntries[dateKey][classId].completed = 
-                journalEntries[dateKey][classId].completed.filter(w => w !== work);
-            saveData();
-            renderJournal();
-        }
+        // Save assignment buttons
+        document.querySelectorAll('.save-assignment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.class);
+                saveAssignment(classId);
+            });
+        });
+        
+        // Cancel assignment buttons
+        document.querySelectorAll('.cancel-assignment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.class);
+                hideAssignmentForm(classId);
+            });
+        });
+        
+        // Complete assignment buttons
+        document.querySelectorAll('.complete-assignment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const assignmentId = parseInt(this.dataset.id);
+                completeAssignment(assignmentId);
+            });
+        });
+        
+        // Remove assignment buttons
+        document.querySelectorAll('.remove-assignment-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.class);
+                const assignmentId = parseInt(this.dataset.id);
+                removeAssignment(classId, assignmentId);
+            });
+        });
     }
     
     function saveNotes(classId) {
@@ -521,10 +559,203 @@
         const dateKey = getDateKey(currentDate);
         
         if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
-        if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], notes: '' };
+        if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { notes: '', assignments: [] };
         
         journalEntries[dateKey][classId].notes = notes;
         saveData();
+    }
+    
+    function showAssignmentForm(classId) {
+        document.getElementById(`assignmentForm-${classId}`).classList.add('active');
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById(`assignmentDue-${classId}`).min = today;
+    }
+    
+    function hideAssignmentForm(classId) {
+        const form = document.getElementById(`assignmentForm-${classId}`);
+        form.classList.remove('active');
+        document.getElementById(`assignmentTitle-${classId}`).value = '';
+        document.getElementById(`assignmentDue-${classId}`).value = '';
+    }
+    
+    function saveAssignment(classId) {
+        const title = document.getElementById(`assignmentTitle-${classId}`).value.trim();
+        const dueDate = document.getElementById(`assignmentDue-${classId}`).value;
+        
+        if (!title) {
+            alert('Please enter an assignment title');
+            return;
+        }
+        
+        const assignment = {
+            id: nextAssignmentId++,
+            title: title,
+            dueDate: dueDate,
+            classId: classId,
+            completed: false,
+            createdDate: getDateKey(currentDate)
+        };
+        
+        const dateKey = getDateKey(currentDate);
+        if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
+        if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { notes: '', assignments: [] };
+        
+        journalEntries[dateKey][classId].assignments.push(assignment);
+        assignments.push(assignment);
+        
+        hideAssignmentForm(classId);
+        saveData();
+        renderJournal();
+        alert('Assignment added successfully!');
+    }
+    
+    function removeAssignment(classId, assignmentId) {
+        const dateKey = getDateKey(currentDate);
+        if (journalEntries[dateKey] && journalEntries[dateKey][classId]) {
+            journalEntries[dateKey][classId].assignments = journalEntries[dateKey][classId].assignments.filter(a => a.id !== assignmentId);
+            assignments = assignments.filter(a => a.id !== assignmentId);
+            saveData();
+            renderJournal();
+        }
+    }
+    
+    function completeAssignment(assignmentId) {
+        const assignment = assignments.find(a => a.id === assignmentId);
+        if (assignment) {
+            assignment.completed = true;
+            assignment.completedDate = new Date().toISOString();
+            saveData();
+            renderJournal();
+            alert(`✅ "${assignment.title}" marked as complete!`);
+        }
+    }
+    
+    // All Assignments View
+    function renderAllAssignments() {
+        const container = document.getElementById('assignmentsList');
+        
+        if (assignments.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📋</div>
+                    <h3>No assignments yet!</h3>
+                    <p>Add assignments in your Daily Journal to see them here.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const pendingAssignments = assignments.filter(a => !a.completed);
+        const completedAssignments = assignments.filter(a => a.completed);
+        
+        // Sort by due date
+        pendingAssignments.sort((a, b) => {
+            if (!a.dueDate && !b.dueDate) return 0;
+            if (!a.dueDate) return 1;
+            if (!b.dueDate) return -1;
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        });
+        
+        let html = '';
+        
+        if (pendingAssignments.length > 0) {
+            html += '<div class="card"><h3>📋 Pending Assignments</h3>';
+            pendingAssignments.forEach(assignment => {
+                const className = classes.find(c => c.id === assignment.classId)?.name || 'Unknown Class';
+                html += `
+                    <div class="assignment-item">
+                        <div>
+                            <div style="font-weight: 600;">${assignment.title}</div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                ${className} • Due: <span class="${getDueDateClass(assignment.dueDate)}">${formatDueDate(assignment.dueDate)}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-small" onclick="completeAssignmentFromList(${assignment.id})">✅ Complete</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+        
+        if (completedAssignments.length > 0) {
+            html += '<div class="card"><h3>✅ Completed Assignments</h3>';
+            completedAssignments.forEach(assignment => {
+                const className = classes.find(c => c.id === assignment.classId)?.name || 'Unknown Class';
+                html += `
+                    <div class="assignment-item" style="opacity: 0.7;">
+                        <div>
+                            <div style="font-weight: 600;">${assignment.title}</div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                ${className} • Completed: ${new Date(assignment.completedDate).toLocaleDateString()}
+                            </div>
+                        </div>
+                        <span style="color: #4caf50; font-weight: bold;">✅ Done</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+        
+        container.innerHTML = html;
+    }
+    
+    function completeAssignmentFromList(assignmentId) {
+        completeAssignment(assignmentId);
+        renderAllAssignments();
+    }
+    
+    // All Notes View
+    function renderAllNotes() {
+        populateNotesFilter();
+        const container = document.getElementById('notesList');
+        const allNotes = [];
+        
+        Object.keys(journalEntries).forEach(date => {
+            Object.keys(journalEntries[date]).forEach(classId => {
+                const entry = journalEntries[date][classId];
+                if (entry.notes && entry.notes.trim()) {
+                    const className = classes.find(c => c.id == classId)?.name || 'Unknown Class';
+                    if (currentNotesFilter === 'all' || classId == currentNotesFilter) {
+                        allNotes.push({ date, className, notes: entry.notes });
+                    }
+                }
+            });
+        });
+        
+        if (allNotes.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📝</div>
+                    <h3>No notes found!</h3>
+                    <p>Start taking notes in your Daily Journal to see them here.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        allNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        container.innerHTML = allNotes.map(note => `
+            <div class="card" style="margin-bottom: 15px;">
+                <h4>${note.className}</h4>
+                <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">
+                    ${new Date(note.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap;">${note.notes}</div>
+            </div>
+        `).join('');
+    }
+    
+    function populateNotesFilter() {
+        const select = document.getElementById('notesFilter');
+        let html = '<option value="all">All Classes</option>';
+        
+        classes.forEach(cls => {
+            const selected = currentNotesFilter == cls.id ? ' selected' : '';
+            html += `<option value="${cls.id}"${selected}>${cls.name}</option>`;
+        });
+        
+        select.innerHTML = html;
     }
     
     // Setup Functions
@@ -544,7 +775,7 @@
                         <div style="color: #666; font-size: 0.9em;">${cls.period}</div>
                     </div>
                     <div>
-                        <button class="btn btn-edit edit-class-btn" data-id="${cls.id}">✏️ Edit</button>
+                        <button class="btn btn-edit btn-small edit-class-btn" data-id="${cls.id}">✏️ Edit</button>
                         <button class="btn btn-danger btn-small delete-class-btn" data-id="${cls.id}">🗑️ Delete</button>
                     </div>
                 </div>
@@ -557,7 +788,11 @@
             </div>
         `).join('');
         
-        // Add event listeners for edit buttons
+        attachSetupEventListeners();
+    }
+    
+    function attachSetupEventListeners() {
+        // Edit buttons
         document.querySelectorAll('.edit-class-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const classId = parseInt(this.dataset.id);
@@ -565,7 +800,7 @@
             });
         });
         
-        // Add event listeners for delete buttons
+        // Delete buttons
         document.querySelectorAll('.delete-class-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const classId = parseInt(this.dataset.id);
@@ -573,7 +808,7 @@
             });
         });
         
-        // Add event listeners for save buttons
+        // Save buttons
         document.querySelectorAll('.save-class-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const classId = parseInt(this.dataset.id);
@@ -581,7 +816,7 @@
             });
         });
         
-        // Add event listeners for cancel buttons
+        // Cancel buttons
         document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const classId = parseInt(this.dataset.id);
@@ -624,10 +859,9 @@
             
             saveData();
             renderSetup();
-            populateFilters();
             alert('✅ Class updated successfully!');
             
-            // If we're currently viewing the journal, re-render it to show updated class names
+            // If we're currently viewing the journal, re-render it
             if (document.getElementById('journalView').classList.contains('active')) {
                 renderJournal();
             }
@@ -638,7 +872,7 @@
         const classToDelete = classes.find(c => c.id === classId);
         if (!classToDelete) return;
         
-        const confirmMessage = `Are you sure you want to delete "${classToDelete.name}"?\n\nThis will also delete all associated journal entries and notes for this class.`;
+        const confirmMessage = `Are you sure you want to delete "${classToDelete.name}"?\n\nThis will also delete all associated notes and assignments for this class.`;
         
         if (confirm(confirmMessage)) {
             // Remove class from classes array
@@ -651,9 +885,11 @@
                 }
             });
             
+            // Remove all assignments for this class
+            assignments = assignments.filter(a => a.classId !== classId);
+            
             saveData();
             renderSetup();
-            populateFilters();
             alert('🗑️ Class deleted successfully!');
             
             // If we're currently viewing the journal, re-render it
@@ -684,94 +920,8 @@
         nameInput.value = '';
         periodInput.value = '';
         saveData();
-        alert('Class added successfully!');
-        populateFilters();
-        renderSetup(); // Re-render to show the new class
-    }
-    
-    // Filter Functions
-    function populateFilters() {
-        const notesFilter = document.getElementById('notesFilter');
-        const completedFilter = document.getElementById('completedFilter');
-        
-        let options = '<option value="all">All Classes</option>';
-        classes.forEach(cls => {
-            options += `<option value="${cls.id}">${cls.name}</option>`;
-        });
-        
-        notesFilter.innerHTML = options;
-        completedFilter.innerHTML = options;
-    }
-    
-    function renderNotes() {
-        populateFilters();
-        const container = document.getElementById('notesList');
-        const allNotes = [];
-        
-        Object.keys(journalEntries).forEach(date => {
-            Object.keys(journalEntries[date]).forEach(classId => {
-                const entry = journalEntries[date][classId];
-                if (entry.notes && entry.notes.trim()) {
-                    const className = classes.find(c => c.id == classId)?.name || 'Unknown Class';
-                    if (currentNotesFilter === 'all' || classId == currentNotesFilter) {
-                        allNotes.push({ date, className, notes: entry.notes });
-                    }
-                }
-            });
-        });
-        
-        if (allNotes.length === 0) {
-            container.innerHTML = '<div class="empty-state"><div class="icon">📝</div><h3>No notes found!</h3><p>Start taking notes in your Daily Journal.</p></div>';
-            return;
-        }
-        
-        allNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        container.innerHTML = allNotes.map(note => `
-            <div class="card" style="margin-bottom: 15px;">
-                <h4>${note.className}</h4>
-                <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">
-                    ${new Date(note.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap;">${note.notes}</div>
-            </div>
-        `).join('');
-    }
-    
-    function renderCompleted() {
-        populateFilters();
-        const container = document.getElementById('completedList');
-        const allCompleted = [];
-        
-        Object.keys(journalEntries).forEach(date => {
-            Object.keys(journalEntries[date]).forEach(classId => {
-                const entry = journalEntries[date][classId];
-                if (entry.completed && entry.completed.length > 0) {
-                    const className = classes.find(c => c.id == classId)?.name || 'Unknown Class';
-                    entry.completed.forEach(work => {
-                        if (currentCompletedFilter === 'all' || classId == currentCompletedFilter) {
-                            allCompleted.push({ date, className, work });
-                        }
-                    });
-                }
-            });
-        });
-        
-        if (allCompleted.length === 0) {
-            container.innerHTML = '<div class="empty-state"><div class="icon">✅</div><h3>No completed work found!</h3><p>Mark work as completed in your Daily Journal.</p></div>';
-            return;
-        }
-        
-        allCompleted.sort((a, b) => new Date(b.date) - new Date(a.date));
-        
-        container.innerHTML = allCompleted.map(item => `
-            <div class="work-item" style="margin-bottom: 10px;">
-                <div>
-                    <div style="font-weight: 600;">${item.work}</div>
-                    <div style="font-size: 0.9em; color: #666;">${item.className} • ${new Date(item.date).toLocaleDateString()}</div>
-                </div>
-            </div>
-        `).join('');
+        renderSetup();
+        alert('✅ Class added successfully!');
     }
     
     // Backup Functions
@@ -780,7 +930,8 @@
             version: "1.0",
             exportDate: new Date().toISOString(),
             classes: classes,
-            journalEntries: journalEntries
+            journalEntries: journalEntries,
+            assignments: assignments
         };
         
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -806,6 +957,7 @@
                 if (confirm('This will replace your current data. Continue?')) {
                     if (data.classes) classes = data.classes;
                     if (data.journalEntries) journalEntries = data.journalEntries;
+                    if (data.assignments) assignments = data.assignments;
                     saveData();
                     alert('✅ Data restored successfully!');
                     location.reload();
@@ -835,11 +987,6 @@
         // Setup
         document.getElementById('addClassBtn').addEventListener('click', addClass);
         
-        // Show setup view initially if no classes
-        if (classes.length > 0) {
-            renderSetup();
-        }
-        
         // Export buttons
         document.getElementById('exportBtn').addEventListener('click', exportData);
         document.getElementById('exportBtn2').addEventListener('click', exportData);
@@ -850,23 +997,26 @@
         });
         document.getElementById('importFile').addEventListener('change', importData);
         
-        // Filters
+        // Notes filter
         document.getElementById('notesFilter').addEventListener('change', function() {
             currentNotesFilter = this.value;
-            renderNotes();
-        });
-        
-        document.getElementById('completedFilter').addEventListener('change', function() {
-            currentCompletedFilter = this.value;
-            renderCompleted();
+            renderAllNotes();
         });
         
         // Initialize app
         loadData();
         updateDateDisplay();
-        renderJournal();
-        populateFilters();
+        
+        if (classes.length === 0) {
+            // If no classes, show setup view
+            showView('setup');
+        } else {
+            renderJournal();
+        }
     });
+    
+    // Global functions for onclick handlers
+    window.completeAssignmentFromList = completeAssignmentFromList;
 </script>
 ```
 
