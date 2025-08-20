@@ -1,0 +1,28 @@
+            // Add auto-save functionality for notes
+            var notesTimeouts = {};
+            
+            function autoSaveNotes(classId) {
+                // Clear existing timeout to prevent multiple saves
+                if (notesTimeouts[classId]) {
+                    clearTimeout(notesTimeouts[classId]);
+                }
+                
+                // Set new timeout to save after 1 second of no typing
+                notesTimeouts[classId] = setTimeout(function() {
+                    saveNotes(classId);
+                }, 1000);
+            }
+            
+            function saveNotes(classId) {
+                var notesElement = document.getElementById('notes-' + classId);
+                if (!notesElement) return;
+                
+                var notes = notesElement.value;
+                var dateKey = getDateKey(currentDate);
+                
+                if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
+                if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], assignments: [], notes: '' };
+                
+                journalEntries[dateKey][classId].notes = notes;
+                saveData();
+            }
