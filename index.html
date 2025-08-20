@@ -1,28 +1,940 @@
-            // Add auto-save functionality for notes
-            var notesTimeouts = {};
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>My Assignment Notebook</title>
+    <meta name="description" content="Digital assignment notebook for students with ADD/ADHD and autism spectrum needs">
+    <meta name="theme-color" content="#667eea">
+
+```
+<style>
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #4caf50;
+        --danger-color: #f44336;
+        --warning-color: #ff9800;
+        --info-color: #2196f3;
+        --light-color: #f8f9fa;
+        --dark-color: #333;
+        
+        --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        --font-size-base: 16px;
+        --font-size-large: 1.25rem;
+        --font-size-small: 0.875rem;
+        
+        --spacing-xs: 4px;
+        --spacing-sm: 8px;
+        --spacing-md: 16px;
+        --spacing-lg: 24px;
+        --spacing-xl: 32px;
+        
+        --border-radius: 8px;
+        --border-radius-lg: 16px;
+        --border-width: 1px;
+        --max-width: 1000px;
+        
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: var(--font-family);
+        margin: 0;
+        padding: var(--spacing-lg);
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: var(--dark-color);
+        line-height: 1.6;
+        min-height: 100vh;
+        font-weight: normal;
+        font-variant-emoji: emoji;
+    }
+    
+    .container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+        padding: var(--spacing-lg) var(--spacing-md);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .header h1 {
+        font-size: 2.5em;
+        margin: 0 0 var(--spacing-sm) 0;
+        font-weight: 700;
+    }
+    
+    .header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1.1em;
+    }
+    
+    .main-nav {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-xl);
+        background: white;
+        padding: var(--spacing-sm);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .nav-btn {
+        flex: 1;
+        padding: var(--spacing-md);
+        border: none;
+        background: transparent;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: var(--font-size-base);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        color: var(--dark-color);
+    }
+    
+    .nav-btn.active {
+        background: var(--primary-color);
+        color: white;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .nav-btn:hover:not(.active) {
+        background: var(--light-color);
+    }
+    
+    .view-section {
+        display: none;
+    }
+    
+    .view-section.active {
+        display: block;
+    }
+    
+    .card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .date-selector {
+        background: white;
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius-lg);
+        margin-bottom: var(--spacing-lg);
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-lg);
+        flex-wrap: wrap;
+    }
+    
+    .date-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+    
+    .date-nav button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        font-size: 1.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .date-nav button:hover {
+        background: var(--secondary-color);
+        transform: scale(1.1);
+    }
+    
+    .current-date {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: var(--dark-color);
+        min-width: 250px;
+        text-align: center;
+    }
+    
+    .quick-today {
+        background: var(--success-color);
+        color: white;
+        border: none;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-today:hover {
+        background: #45a049;
+        transform: translateY(-1px);
+    }
+    
+    .classes-container {
+        display: grid;
+        gap: var(--spacing-lg);
+    }
+    
+    .class-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-lg);
+        box-shadow: var(--shadow-md);
+        border-left: 5px solid var(--primary-color);
+        transition: transform 0.2s ease;
+    }
+    
+    .class-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .class-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-md);
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+    
+    .class-name {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: var(--dark-color);
+        flex: 1;
+    }
+    
+    .class-period {
+        background: var(--light-color);
+        padding: var(--spacing-xs) var(--spacing-md);
+        border-radius: 20px;
+        font-size: var(--font-size-small);
+        color: #666;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .class-content {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+    
+    .section {
+        background: var(--light-color);
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius);
+        border: 1px solid #e0e0e0;
+    }
+    
+    .section h4 {
+        margin: 0 0 var(--spacing-sm) 0;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        font-size: 1.1em;
+    }
+    
+    .completed-work {
+        border-left: 3px solid var(--success-color);
+    }
+    
+    .new-assignments {
+        border-left: 3px solid var(--warning-color);
+    }
+    
+    .notes-section {
+        border-left: 3px solid var(--info-color);
+    }
+    
+    .notes-save-indicator {
+        color: #666;
+        font-size: 0.85em;
+        margin-top: 4px;
+        display: block;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .notes-save-indicator.show {
+        opacity: 1;
+    }
+    
+    .work-item, .assignment-item {
+        background: white;
+        padding: var(--spacing-sm);
+        border-radius: var(--border-radius);
+        margin-bottom: var(--spacing-sm);
+        border: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+    
+    .assignment-info {
+        flex: 1;
+    }
+    
+    .assignment-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 2px;
+    }
+    
+    .due-date {
+        font-size: var(--font-size-small);
+        color: #666;
+    }
+    
+    .due-date.overdue {
+        color: var(--danger-color);
+        font-weight: bold;
+    }
+    
+    .due-date.today {
+        color: var(--warning-color);
+        font-weight: bold;
+    }
+    
+    .due-date.tomorrow {
+        color: #ffc107;
+        font-weight: bold;
+    }
+    
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: var(--font-size-base);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-success {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .btn-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+    
+    .btn-warning {
+        background: var(--warning-color);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-small {
+        padding: 4px 8px;
+        font-size: var(--font-size-small);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: var(--spacing-sm);
+        border: 2px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: var(--font-size-base);
+        font-family: var(--font-family);
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-group {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: var(--spacing-xs);
+        color: #555;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+    
+    .form-row .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .assignment-form {
+        display: none;
+        background: #e3f2fd;
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius);
+        margin-top: var(--spacing-sm);
+        border: 1px solid #bbdefb;
+    }
+    
+    .assignment-form.active {
+        display: block;
+    }
+    
+    .form-buttons {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+    
+    .assignments-filters {
+        background: white;
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius-lg);
+        margin-bottom: var(--spacing-lg);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .filter-tabs {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: var(--font-size-small);
+        font-weight: 600;
+    }
+    
+    .filter-tab.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .filter-tab:hover:not(.active) {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .assignments-list {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+    
+    .assignment-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: var(--spacing-lg);
+        border-left: 5px solid var(--primary-color);
+        transition: transform 0.2s ease;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .assignment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .assignment-card.overdue {
+        border-left-color: var(--danger-color);
+        background: #ffebee;
+    }
+    
+    .assignment-card.due-soon {
+        border-left-color: var(--warning-color);
+        background: #fff3e0;
+    }
+    
+    .assignment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--spacing-sm);
+        gap: var(--spacing-md);
+    }
+    
+    .assignment-details h3 {
+        margin: 0 0 var(--spacing-xs) 0;
+        color: var(--dark-color);
+        font-size: 1.2em;
+    }
+    
+    .assignment-meta {
+        display: flex;
+        gap: var(--spacing-md);
+        font-size: var(--font-size-small);
+        color: #666;
+        margin-bottom: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+    
+    .meta-tag {
+        background: var(--light-color);
+        padding: 2px var(--spacing-sm);
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        white-space: nowrap;
+    }
+    
+    .stats-summary {
+        background: white;
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius);
+        margin-bottom: var(--spacing-lg);
+        text-align: center;
+        color: #666;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #e0e0e0;
+    }
+    
+    .setup-container {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-xl);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .setup-header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+    
+    .setup-header h2 {
+        color: var(--primary-color);
+        margin-bottom: var(--spacing-sm);
+        font-size: 1.8em;
+    }
+    
+    .setup-header p {
+        color: #666;
+        font-size: 1.1em;
+    }
+    
+    .classes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+        margin: var(--spacing-lg) 0;
+    }
+    
+    .class-input-group {
+        background: var(--light-color);
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius);
+        border: 2px solid #e0e0e0;
+        transition: border-color 0.3s ease;
+    }
+    
+    .class-input-group:hover {
+        border-color: var(--primary-color);
+    }
+    
+    .class-input-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: var(--spacing-md);
+        color: #555;
+        font-size: 1.1em;
+    }
+    
+    .setup-buttons {
+        display: flex;
+        gap: var(--spacing-md);
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: var(--spacing-xl) 0;
+    }
+    
+    .backup-section {
+        background: linear-gradient(135deg, #e8f4f8, var(--light-color));
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius-lg);
+        margin-top: var(--spacing-xl);
+        border-left: 5px solid var(--primary-color);
+    }
+    
+    .backup-section h3 {
+        color: var(--primary-color);
+        margin-bottom: var(--spacing-sm);
+        font-size: 1.4em;
+    }
+    
+    .backup-section p {
+        color: #666;
+        margin-bottom: var(--spacing-lg);
+        line-height: 1.6;
+    }
+    
+    .backup-buttons {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+        flex-wrap: wrap;
+    }
+    
+    .backup-btn {
+        flex: 1;
+        min-width: 200px;
+        padding: var(--spacing-md) var(--spacing-lg);
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: var(--font-size-base);
+        transition: all 0.3s ease;
+    }
+    
+    .backup-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .backup-info {
+        background: white;
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius);
+        border: 1px solid #e0e0e0;
+    }
+    
+    .backup-info h4 {
+        margin-bottom: var(--spacing-md);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .backup-info ul {
+        margin: 0;
+        padding-left: var(--spacing-lg);
+    }
+    
+    .backup-info li {
+        color: #666;
+        margin-bottom: var(--spacing-sm);
+        line-height: 1.5;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-xl) var(--spacing-lg);
+        color: #666;
+    }
+    
+    .empty-state .icon {
+        font-size: 4em;
+        margin-bottom: var(--spacing-lg);
+        font-weight: normal;
+    }
+    
+    .import-status {
+        background: #e8f5e8;
+        color: #2e7d32;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius);
+        margin-top: var(--spacing-md);
+        display: none;
+        border: 1px solid #c8e6c9;
+    }
+    
+    .hidden {
+        display: none !important;
+    }
+    
+    @media (max-width: 768px) {
+        body {
+            padding: var(--spacing-sm);
+        }
+        
+        .header h1 {
+            font-size: 2em;
+        }
+        
+        .main-nav {
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .date-nav {
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .form-row {
+            flex-direction: column;
+        }
+        
+        .assignment-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+        }
+        
+        .filter-tabs {
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .classes-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .setup-buttons {
+            flex-direction: column;
+        }
+        
+        .backup-buttons {
+            flex-direction: column;
+        }
+        
+        .backup-btn {
+            min-width: auto;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 My Assignment Notebook</h1>
+            <p>Digital planner for organized students</p>
+        </div>
+
+```
+    <div class="main-nav">
+        <button class="nav-btn active" id="journalTab" onclick="switchView('journal')">
+            📝 Daily Journal
+        </button>
+        <button class="nav-btn" id="assignmentsTab" onclick="switchView('assignments')">
+            📋 Assignment List
+        </button>
+        <button class="nav-btn" id="classNotesTab" onclick="switchView('classNotes')">
+            📚 Class Notes
+        </button>
+        <button class="nav-btn" id="setupTab" onclick="switchView('setup')">
+            ⚙️ Setup & Backup
+        </button>
+    </div>
+    
+    <!-- Daily Journal View -->
+    <div class="view-section active" id="journalView">
+        <div class="date-selector">
+            <div class="date-nav">
+                <button onclick="changeDate(-1)" title="Previous Day">&larr;</button>
+                <div class="current-date" id="currentDate">Today, August 16, 2025</div>
+                <button onclick="changeDate(1)" title="Next Day">&rarr;</button>
+            </div>
+            <button class="quick-today" onclick="goToToday()">📅 Today</button>
+        </div>
+        
+        <div class="classes-container" id="classesContainer">
+            <!-- Classes will be populated here -->
+        </div>
+    </div>
+    
+    <!-- Assignment List View -->
+    <div class="view-section" id="assignmentsView">
+        <div class="assignments-filters">
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterAssignments('all', this)">All</button>
+                <button class="filter-tab" onclick="filterAssignments('due-today', this)">Due Today</button>
+                <button class="filter-tab" onclick="filterAssignments('due-tomorrow', this)">Due Tomorrow</button>
+                <button class="filter-tab" onclick="filterAssignments('due-this-week', this)">This Week</button>
+                <button class="filter-tab" onclick="filterAssignments('overdue', this)">Overdue</button>
+            </div>
             
-            function autoSaveNotes(classId) {
-                // Clear existing timeout to prevent multiple saves
-                if (notesTimeouts[classId]) {
-                    clearTimeout(notesTimeouts[classId]);
-                }
+            <div style="text-align: center; margin-top: var(--spacing-md);">
+                <button class="btn btn-primary" onclick="exportData()">
+                    💾 Quick Backup Download
+                </button>
+            </div>
+        </div>
+        
+        <div class="stats-summary" id="assignmentStats">
+            <!-- Assignment statistics will be shown here -->
+        </div>
+        
+        <div class="assignments-list" id="assignmentsList">
+            <!-- Assignments will be populated here -->
+        </div>
+    </div>
+    
+    <!-- Class Notes View -->
+    <div class="view-section" id="classNotesView">
+        <div class="card">
+            <div class="empty-state">
+                <div class="icon">📝</div>
+                <h3>Class Notes Feature</h3>
+                <p>Coming soon! This will show your notes organized by class and date.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Setup View -->
+    <div class="view-section" id="setupView">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h2>⚙️ Setup Your Classes</h2>
+                <p>Enter your class schedule to get started with your digital assignment notebook.</p>
+            </div>
+            
+            <div class="classes-grid" id="classSetupGrid">
+                <!-- Class setup inputs will be here -->
+            </div>
+            
+            <div class="setup-buttons">
+                <button class="btn btn-secondary" onclick="addClassSlot()">➕ Add Another Class</button>
+                <button class="btn btn-primary" onclick="saveClassSetup()">💾 Save Classes</button>
+            </div>
+            
+            <!-- Backup Section -->
+            <div class="backup-section">
+                <h3>💾 Backup & Restore Your Data</h3>
+                <p>Download a backup file that you can email to yourself, save to your phone, or store anywhere safe!</p>
                 
-                // Set new timeout to save after 1 second of no typing
-                notesTimeouts[classId] = setTimeout(function() {
-                    saveNotes(classId);
-                }, 1000);
+                <div class="backup-buttons">
+                    <button class="backup-btn btn-primary" onclick="exportData()">
+                        📄 Download Backup File
+                    </button>
+                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
+                    <button class="backup-btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                        📤 Restore from Backup
+                    </button>
+                </div>
+                
+                <div class="import-status" id="importStatus">
+                    <!-- Import status messages will appear here -->
+                </div>
+                
+                <div class="backup-info">
+                    <h4>💡 Backup Tips:</h4>
+                    <ul>
+                        <li>Email the backup file to yourself for safekeeping</li>
+                        <li>Download a new backup weekly to stay current</li>
+                        <li>Share backup files with family members who help with homework</li>
+                        <li>Keep backups when switching devices or browsers</li>
+                        <li>Backup files are small (usually under 100KB) and easy to share</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(window, document) {
+        'use strict';
+        
+        // ===== PRODUCTION-READY STORAGE MANAGEMENT =====
+        
+        function isStorageSupported(storageType) {
+            if (typeof window === 'undefined' || !window[storageType]) return false;
+            
+            var storage;
+            try {
+                storage = window[storageType];
+                if (!storage) return false;
+                
+                var testKey = '__storage_test__';
+                storage.setItem(testKey, testKey);
+                storage.removeItem(testKey);
+                return true;
+            } catch (err) {
+                return (
+                    err instanceof DOMException &&
+                    (err.code === 22 || err.code === 1014 ||
+                     err.name === 'QuotaExceededError' ||
+                     err.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                    storage && storage.length > 0
+                );
+            }
+        }
+        
+        function isQuotaExceededError(err) {
+            return (
+                err instanceof DOMException &&
+                (err.code === 22 || err.code === 1014 ||
+                 err.name === 'QuotaExceededError' ||
+                 err.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+            );
+        }
+        
+        function safeSetItem(key, value, maxRetries) {
+            if (maxRetries === undefined) maxRetries = 3;
+            
+            if (typeof window === 'undefined' || !window.localStorage) {
+                return { success: false, error: 'ENVIRONMENT_UNAVAILABLE' };
             }
             
-            function saveNotes(classId) {
-                var notesElement = document.getElementById('notes-' + classId);
-                if (!notesElement) return;
-                
-                var notes = notesElement.value;
-                var dateKey = getDateKey(currentDate);
-                
-                if (!journalEntries[dateKey]) journalEntries[dateKey] = {};
-                if (!journalEntries[dateKey][classId]) journalEntries[dateKey][classId] = { completed: [], assignments: [], notes: '' };
-                
-                journalEntries[dateKey][classId].notes = notes;
-                saveData();
-            }
+            try {
+                localStorage.setItem(key, value);
+                return { success: true };
+            } catch (error) {
+                if (isQuotaExceededError(error)) {
+                    if (maxRetries > 0) {
+                        clearOldestItems(1);
+```
