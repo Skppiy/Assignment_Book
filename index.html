@@ -180,6 +180,42 @@
         text-align: center;
     }
     
+    .class-edit-item {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border-left: 5px solid #667eea;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .class-edit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .class-edit-form {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .class-edit-form.active {
+        display: block;
+    }
+    
+    .btn-edit {
+        background: #17a2b8;
+        color: white;
+        padding: 5px 10px;
+        font-size: 0.9em;
+        margin-right: 5px;
+    }
+    
     @media (max-width: 768px) {
         .nav { flex-direction: column; }
         body { padding: 10px; }
@@ -275,12 +311,24 @@
     <div class="view" id="setupView">
         <div class="card">
             <h2>⚙️ Setup Your Classes</h2>
-            <p>Add your classes to get started.</p>
+            <p>Add new classes or edit existing ones.</p>
+            
+            <!-- Existing Classes -->
             <div style="margin: 20px 0;">
+                <h3>Your Classes</h3>
+                <div id="existingClasses">
+                    <!-- Existing classes will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Add New Class -->
+            <div style="margin: 20px 0; padding: 20px; background: #f0f8ff; border-radius: 10px;">
+                <h3>Add New Class</h3>
                 <input type="text" class="form-control" id="className" placeholder="Class name (e.g., AP Biology)">
                 <input type="text" class="form-control" id="classPeriod" placeholder="Period (e.g., 1st Period)">
                 <button class="btn btn-primary" id="addClassBtn">Add Class</button>
             </div>
+            
             <div style="margin-top: 30px; padding: 20px; background: #e8f4f8; border-radius: 10px;">
                 <h3>💾 Backup & Restore</h3>
                 <button class="btn btn-primary" id="exportBtn2">📄 Download Backup</button>
@@ -344,6 +392,7 @@
         if (viewName === 'journal') renderJournal();
         else if (viewName === 'notes') renderNotes();
         else if (viewName === 'completed') renderCompleted();
+        else if (viewName === 'setup') renderSetup();
     }
     
     // Date Functions
@@ -479,6 +528,141 @@
     }
     
     // Setup Functions
+    function renderSetup() {
+        const container = document.getElementById('existingClasses');
+        
+        if (classes.length === 0) {
+            container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No classes added yet. Add your first class below!</p>';
+            return;
+        }
+        
+        container.innerHTML = classes.map(cls => `
+            <div class="class-edit-item">
+                <div class="class-edit-header">
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.1em;">${cls.name}</div>
+                        <div style="color: #666; font-size: 0.9em;">${cls.period}</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-edit edit-class-btn" data-id="${cls.id}">✏️ Edit</button>
+                        <button class="btn btn-danger btn-small delete-class-btn" data-id="${cls.id}">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="class-edit-form" id="editForm-${cls.id}">
+                    <input type="text" class="form-control" id="editName-${cls.id}" value="${cls.name}" placeholder="Class name">
+                    <input type="text" class="form-control" id="editPeriod-${cls.id}" value="${cls.period}" placeholder="Period">
+                    <button class="btn btn-success save-class-btn" data-id="${cls.id}">💾 Save Changes</button>
+                    <button class="btn btn-secondary cancel-edit-btn" data-id="${cls.id}">❌ Cancel</button>
+                </div>
+            </div>
+        `).join('');
+        
+        // Add event listeners for edit buttons
+        document.querySelectorAll('.edit-class-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.id);
+                showEditForm(classId);
+            });
+        });
+        
+        // Add event listeners for delete buttons
+        document.querySelectorAll('.delete-class-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.id);
+                deleteClass(classId);
+            });
+        });
+        
+        // Add event listeners for save buttons
+        document.querySelectorAll('.save-class-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.id);
+                saveClassEdit(classId);
+            });
+        });
+        
+        // Add event listeners for cancel buttons
+        document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const classId = parseInt(this.dataset.id);
+                hideEditForm(classId);
+            });
+        });
+    }
+    
+    function showEditForm(classId) {
+        // Hide all other edit forms
+        document.querySelectorAll('.class-edit-form').forEach(form => {
+            form.classList.remove('active');
+        });
+        
+        // Show the specific edit form
+        document.getElementById(`editForm-${classId}`).classList.add('active');
+    }
+    
+    function hideEditForm(classId) {
+        document.getElementById(`editForm-${classId}`).classList.remove('active');
+    }
+    
+    function saveClassEdit(classId) {
+        const nameInput = document.getElementById(`editName-${classId}`);
+        const periodInput = document.getElementById(`editPeriod-${classId}`);
+        
+        const name = nameInput.value.trim();
+        const period = periodInput.value.trim();
+        
+        if (!name) {
+            alert('Please enter a class name');
+            return;
+        }
+        
+        // Find and update the class
+        const classIndex = classes.findIndex(c => c.id === classId);
+        if (classIndex !== -1) {
+            classes[classIndex].name = name;
+            classes[classIndex].period = period || classes[classIndex].period;
+            
+            saveData();
+            renderSetup();
+            populateFilters();
+            alert('✅ Class updated successfully!');
+            
+            // If we're currently viewing the journal, re-render it to show updated class names
+            if (document.getElementById('journalView').classList.contains('active')) {
+                renderJournal();
+            }
+        }
+    }
+    
+    function deleteClass(classId) {
+        const classToDelete = classes.find(c => c.id === classId);
+        if (!classToDelete) return;
+        
+        const confirmMessage = `Are you sure you want to delete "${classToDelete.name}"?\n\nThis will also delete all associated journal entries and notes for this class.`;
+        
+        if (confirm(confirmMessage)) {
+            // Remove class from classes array
+            classes = classes.filter(c => c.id !== classId);
+            
+            // Remove all journal entries for this class
+            Object.keys(journalEntries).forEach(date => {
+                if (journalEntries[date][classId]) {
+                    delete journalEntries[date][classId];
+                }
+            });
+            
+            saveData();
+            renderSetup();
+            populateFilters();
+            alert('🗑️ Class deleted successfully!');
+            
+            // If we're currently viewing the journal, re-render it
+            if (document.getElementById('journalView').classList.contains('active')) {
+                renderJournal();
+            }
+        }
+    }
+    
     function addClass() {
         const nameInput = document.getElementById('className');
         const periodInput = document.getElementById('classPeriod');
@@ -502,6 +686,7 @@
         saveData();
         alert('Class added successfully!');
         populateFilters();
+        renderSetup(); // Re-render to show the new class
     }
     
     // Filter Functions
@@ -649,6 +834,11 @@
         
         // Setup
         document.getElementById('addClassBtn').addEventListener('click', addClass);
+        
+        // Show setup view initially if no classes
+        if (classes.length > 0) {
+            renderSetup();
+        }
         
         // Export buttons
         document.getElementById('exportBtn').addEventListener('click', exportData);
